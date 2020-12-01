@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+
+import argparse
+import itertools
+
+parser = argparse.ArgumentParser(description="")
+parser.add_argument('report_path', metavar="path", type=str, help="path for the report file")
+
+args = parser.parse_args()
+
+def process(report_path):
+    try:
+        report = [int(line.strip()) for line in open(report_path).readlines()]
+        combinations = itertools.combinations(report, 2)
+        valid_combination = filter(lambda x: x[0]+x[1] == 2020, combinations)
+        result = map(lambda x: (x, x[0]*x[1]), valid_combination)
+        return list(result)
+
+    except:
+        print("Error reading report file:")
+        raise
+
+if __name__ == '__main__':
+    report_path = args.report_path
+    [print(x[0], x[1]) for x in process(report_path)]
