@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+
+from math import prod
+import argparse
+import itertools
+
+parser = argparse.ArgumentParser(description="")
+parser.add_argument('report_path', metavar="path", type=str, help="path for the report file")
+parser.add_argument('elements_to_combine', metavar="r", type=int, help="number of elements from the report to combine")
+
+args = parser.parse_args()
+
+def process(report_path, elements):
+    try:
+        report = [int(line.strip()) for line in open(report_path).readlines()]
+        combinations = itertools.combinations(report, elements)
+        valid_combination = filter(lambda x: sum(x) == 2020, combinations)
+        result = map(lambda x: (x, prod(x)), valid_combination)
+        return list(result)
+
+    except:
+        print("Error reading report file:")
+        raise
+
+if __name__ == '__main__':
+    report_path = args.report_path
+    elements = args.elements_to_combine
+    [print(x[0], x[1]) for x in process(report_path, elements)]
