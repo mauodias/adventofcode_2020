@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+
+import argparse
+import re
+
+parser = argparse.ArgumentParser(description="")
+parser.add_argument('list_path', metavar="path", type=str, help="path for the password list")
+
+args = parser.parse_args()
+
+def process(list_path):
+    try:
+        policies = open(list_path).read().split('\n')
+        pattern = '(\d+)-(\d+) ([a-z]): ([a-z]+)'
+        valid_passwords = 0
+        for policy in policies:
+            matches = re.search(pattern, policy)
+            min_limit = int(matches.group(1))
+            max_limit = int(matches.group(2))
+            letter_required = matches.group(3)
+            password = matches.group(4)
+            occurrences = re.findall(letter_required, password)
+            if len(occurrences) <= max_limit and len(occurrences) >= min_limit:
+                valid_passwords += 1
+        return valid_passwords
+    except:
+        print("Error reading file:")
+        raise
+
+if __name__ == '__main__':
+    list_path = args.list_path
+    print(process(list_path))
