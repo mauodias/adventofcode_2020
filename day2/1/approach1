@@ -14,6 +14,8 @@ def process(list_path):
         pattern = '(\d+)-(\d+) ([a-z]): ([a-z]+)'
         valid_passwords = 0
         for policy in policies:
+            if not policy:
+                continue
             matches = re.search(pattern, policy)
             min_limit = int(matches.group(1))
             max_limit = int(matches.group(2))
