@@ -1,0 +1,37 @@
+#!/usr/bin/env python
+from collections import namedtuple
+
+import argparse
+import itertools
+
+parser = argparse.ArgumentParser(description="")
+parser.add_argument('tree_map', metavar="path", type=str, help="map of the trees")
+
+args = parser.parse_args()
+
+def process(tree_map):
+    try:
+        tree_matrix = [list(l.strip()) for l in open(tree_map).readlines()]
+        trees = 0
+        pos = namedtuple('Position' , ['x','y'])
+        pos.x = 0
+        pos.y = 0
+        lines = len(tree_matrix)
+        cols = len(tree_matrix[0])
+        while pos.x < lines:
+            pos.x += 1
+            if pos.x >= lines:
+                break
+            pos.y += 3
+            pos.y = pos.y % cols
+            trees += 1 if tree_matrix[pos.x][pos.y] == '#' else 0
+            tree_matrix[pos.x][pos.y] = 'X' if tree_matrix[pos.x][pos.y] == '#' else 'O'
+        return trees
+
+    except:
+        print("Error reading tree map:")
+        raise
+
+if __name__ == '__main__':
+    tree_map = args.tree_map
+    print(process(tree_map))
