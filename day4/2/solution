@@ -1,0 +1,81 @@
+#!/usr/bin/env python
+
+import argparse
+import itertools
+import re
+
+parser = argparse.ArgumentParser(description="")
+parser.add_argument('batch', type=str, help="batch of passports")
+
+args = parser.parse_args()
+
+required_fields = ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid']
+optional_fields = ['cid']
+
+def validate(field, data):
+    if field in ['byr', 'iyr', 'eyr']:
+        data = int(data)
+
+    if field == 'byr':
+        if data >= 1920 and data <= 2002:
+            return True
+    elif field == 'iyr':
+        if data >= 2010 and data <= 2020:
+            return True
+    elif field == 'eyr':
+        if data >= 2020 and data <= 2030:
+            return True
+    elif field == 'hgt':
+        pattern = re.compile('([0-9]+)((cm|in))')
+        matches = pattern.match(data)
+        if matches:
+            height, unit = int(matches.group(1)), matches.group(2)
+            if unit == 'cm':
+                if height >= 150 and height <= 193:
+                    return True
+            elif unit == 'in':
+                if height >= 59 and height <= 76:
+                    return True
+    elif field == 'hcl':
+        pattern = re.compile('#[0-9a-f]{6}')
+        color = pattern.search(data)
+        if color:
+            return True
+    elif field == 'ecl':
+        if data in ['amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth']:
+            return True
+    elif field == 'pid':
+        pattern = re.compile('[0-9]{9}')
+        pid = pattern.search(data)
+        if pid:
+            return True
+    elif field == 'cid':
+        return True
+    return False
+
+def process(batch):
+    try:
+        passports = open(batch).read().split('\n\n')
+        valid = len(passports)
+        valid_passports = []
+        for passport in passports:
+            valid_ = True
+            passport = passport.replace('\n', ' ').strip()
+            fields = {x.split(':')[0]: x.split(':')[1] for x in passport.split(' ')}
+            for field in required_fields:
+                if field not in fields or not validate(field, fields[field]):
+                    valid -= 1
+                    valid_ = False
+                    break
+            if valid_:
+                valid_passports.append(sorted(filter(lambda x: x != 'cid', valid_passports), key=lambda x: x[0]))
+        valid_passports = sorted(filter(lambda x: x != 'cid', valid_passports), key=lambda x: x[0])
+        return valid
+
+    except:
+        print("Error reading batch file")
+        raise
+
+if __name__ == '__main__':
+    batch = args.batch
+    print(process(batch))
