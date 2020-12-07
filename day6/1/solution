@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+
+import argparse
+import itertools
+
+parser = argparse.ArgumentParser(description="")
+parser.add_argument('forms', type=str, help="list of declaration forms")
+
+args = parser.parse_args()
+
+def process(ticket_list):
+    try:
+        total = 0
+        groups = open(ticket_list).read().strip().split('\n\n')
+        for group in groups:
+            total_answers = {}
+            answers = list(group.replace('\n', ''))
+            for answer in answers:
+                if answer in total_answers:
+                    continue
+                else:
+                    total_answers[answer] = 1
+            total += len(total_answers.keys())
+        return total
+
+    except:
+        print("Error reading list of forms")
+        raise
+
+if __name__ == '__main__':
+    forms = args.forms
+    print(process(forms))
